@@ -1,0 +1,126 @@
+-- [[ CYBER ENGINE X.8.3 - EMERGENCY NO-GUI BACKUP MODE ]] --
+
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
+local Player = Players.LocalPlayer
+
+-- Notifikasi sukses menggunakan sistem bawaan Roblox (Anti-Gagal)
+StarterGui:SetCore("SendNotification", {
+    Title = "⚡ Cyber Engine Aktif!",
+    Text = "Mode Darurat Aktif: Auto Plot & Magnet Siap.",
+    Duration = 5
+})
+
+local isAutoEgg = true
+local isMagnet = true
+local isAutoPlot = true
+local lastTeleportTime = 0
+
+-- Fungsi Cari Plot Sendiri
+local function getMyPlotPosition()
+    local targetCFrame = nil
+    pcall(function()
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            pcall(function()
+                if obj and (obj:IsA("BasePart") or obj:IsA("Model")) then
+                    local name = obj.Name:lower()
+                    if name:find("plot") or name:find("base") then
+                        if name:find(Player.Name:lower()) or obj:FindFirstChild(Player.Name) then
+                            local part = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")) or obj
+                            if part and part:IsA("BasePart") then
+                                targetCFrame = part.CFrame * CFrame.new(0, 5, 0)
+                            end
+                        end
+                    end
+                end
+            end)
+            if targetCFrame then break end
+        end
+
+        if not targetCFrame then
+            for _, obj in pairs(Workspace:GetDescendants()) do
+                pcall(function()
+                    if obj and (obj:IsA("BasePart") or obj:IsA("Model")) then
+                        local name = obj.Name:lower()
+                        if name == "plot" or name == "base" then
+                            local part = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")) or obj
+                            if part and part:IsA("BasePart") then
+                                targetCFrame = part.CFrame * CFrame.new(0, 5, 0)
+                            end
+                        end
+                    end
+                end)
+                if targetCFrame then break end
+            end
+        end
+    end)
+    return targetCFrame
+end
+
+-- Looping Utama Berjalan Otomatis di Background
+RunService.Heartbeat:Connect(function()
+    pcall(function()
+        local char = Player.Character
+        if not char then return end
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+
+        -- Auto Teleport ke Plot saat Pegang Telur
+        if isAutoPlot and hrp and (tick() - lastTeleportTime > 5) then
+            local isCarryingEgg = false
+            for _, child in pairs(char:GetDescendants()) do
+                if child:IsA("BasePart") or child:IsA("Model") then
+                    local cName = child.Name:lower()
+                    if cName:find("egg") or cName:find("telur") or cName:find("hold") or cName:find("carry") then
+                        isCarryingEgg = true
+                        break
+                    end
+                end
+            end
+
+            if isCarryingEgg then
+                local plotPos = getMyPlotPosition()
+                if plotPos then
+                    lastTeleportTime = tick()
+                    hrp.CFrame = plotPos
+                    StarterGui:SetCore("SendNotification", {
+                        Title = "🥚 Telur Diamankan!",
+                        Text = "Berhasil dibawa ke plot pribadi!",
+                        Duration = 3
+                    })
+                end
+            end
+        end
+
+        -- Auto Collect & Magnet
+        if (isAutoEgg or isMagnet) and hrp then
+            for _, obj in pairs(Workspace:GetDescendants()) do
+                pcall(function()
+                    if obj and (obj:IsA("Model") or obj:IsA("BasePart")) then
+                        local name = obj.Name:lower()
+                        if (name:find("egg") or name:find("telur") or name:find("nest")) and not name:find("player") then
+                            local part = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")) or obj
+                            if part and part:IsA("BasePart") then
+                                if (part.Position - hrp.Position).Magnitude < 45 then
+                                    if isMagnet then
+                                        part.CFrame = hrp.CFrame * CFrame.new(0, 0, -2)
+                                    end
+                                    local prompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true) or part:FindFirstChildWhichIsA("ProximityPrompt", true)
+                                    if prompt and fireproximityprompt then
+                                        fireproximityprompt(prompt)
+                                    end
+                                    if firetouchinterest then
+                                        firetouchinterest(hrp, part, 0)
+                                        task.wait(0.01)
+                                        firetouchinterest(hrp, part, 1)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end)
+            end
+        end
+    end)
+end)
