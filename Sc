@@ -1,24 +1,330 @@
--- [[ CYBER ENGINE X.8.3 - EMERGENCY NO-GUI BACKUP MODE ]] --
+-- [[ CYBER ENGINE X.11 - LOADING SCREEN & PASSWORD SYSTEM ]] --
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
 local StarterGui = game:GetService("StarterGui")
+local VirtualUser = game:GetService("VirtualUser")
 local Player = Players.LocalPlayer
 
--- Notifikasi sukses menggunakan sistem bawaan Roblox (Anti-Gagal)
-StarterGui:SetCore("SendNotification", {
-    Title = "⚡ Cyber Engine Aktif!",
-    Text = "Mode Darurat Aktif: Auto Plot & Magnet Siap.",
-    Duration = 5
-})
+-- Hapus GUI lama jika ada
+if CoreGui:FindFirstChild("CyberEngineGUI") then
+    CoreGui.CyberEngineGUI:Destroy()
+end
 
-local isAutoEgg = true
-local isMagnet = true
-local isAutoPlot = true
+-- Buat ScreenGui Utama
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "CyberEngineGUI"
+ScreenGui.Parent = CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- ==========================================
+-- 1. BAGIAN LOADING SCREEN
+-- ==========================================
+local LoadingFrame = Instance.new("Frame")
+LoadingFrame.Name = "LoadingFrame"
+LoadingFrame.Parent = ScreenGui
+LoadingFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 18)
+LoadingFrame.Position = UDim2.new(0.5, -175, 0.5, -100)
+LoadingFrame.Size = UDim2.new(0, 350, 0, 200)
+
+local LoadCorner = Instance.new("UICorner")
+LoadCorner.CornerRadius = UDim.new(0, 12)
+LoadCorner.Parent = LoadingFrame
+
+local LoadStroke = Instance.new("UIStroke")
+LoadStroke.Color = Color3.fromRGB(0, 255, 255)
+LoadStroke.Thickness = 2
+LoadStroke.Parent = LoadingFrame
+
+local LoadTitle = Instance.new("TextLabel")
+LoadTitle.Parent = LoadingFrame
+LoadTitle.BackgroundTransparency = 1
+LoadTitle.Position = UDim2.new(0, 0, 0, 25)
+LoadTitle.Size = UDim2.new(1, 0, 0, 30)
+LoadTitle.Font = Enum.Font.GothamBold
+LoadTitle.Text = "⚡ CYBER ENGINE LOADING..."
+LoadTitle.TextColor3 = Color3.fromRGB(0, 255, 255)
+LoadTitle.TextSize = 16
+
+local LoadStatus = Instance.new("TextLabel")
+LoadStatus.Parent = LoadingFrame
+LoadStatus.BackgroundTransparency = 1
+LoadStatus.Position = UDim2.new(0, 0, 0, 65)
+LoadStatus.Size = UDim2.new(1, 0, 0, 20)
+LoadStatus.Font = Enum.Font.Gotham
+LoadStatus.Text = "Menghubungkan ke server..."
+LoadStatus.TextColor3 = Color3.fromRGB(180, 180, 220)
+LoadStatus.TextSize = 12
+
+-- Bar Load Background
+local BarBG = Instance.new("Frame")
+BarBG.Parent = LoadingFrame
+BarBG.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+BarBG.Position = UDim2.new(0.1, 0, 0, 110)
+BarBG.Size = UDim2.new(0.8, 0, 0, 12)
+
+local BarBGCorner = Instance.new("UICorner")
+BarBGCorner.CornerRadius = UDim.new(1, 0)
+BarBGCorner.Parent = BarBG
+
+-- Bar Fill (Animasi Berjalan)
+local BarFill = Instance.new("Frame")
+BarFill.Parent = BarBG
+BarFill.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+BarFill.Size = UDim2.new(0, 0, 1, 0)
+
+local BarFillCorner = Instance.new("UICorner")
+BarFillCorner.CornerRadius = UDim.new(1, 0)
+BarFillCorner.Parent = BarFill
+
+-- Animasi Loading Berjalan
+task.spawn(function()
+    task.wait(0.5)
+    LoadStatus.Text = "Memuat modul keamanan..."
+    BarFill:TweenSize(UDim2.new(0.5, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.8, true)
+    task.wait(1)
+    LoadStatus.Text = "Menyiapkan antarmuka GUI..."
+    BarFill:TweenSize(UDim2.new(1, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.8, true)
+    task.wait(1)
+    LoadingFrame.Visible = false
+    PasswordFrame.Visible = true
+end)
+
+
+-- ==========================================
+-- 2. BAGIAN PASSWORD / LOGIN SYSTEM (Sandi: 123)
+-- ==========================================
+local PasswordFrame = Instance.new("Frame")
+PasswordFrame.Name = "PasswordFrame"
+PasswordFrame.Parent = ScreenGui
+PasswordFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 18)
+PasswordFrame.Position = UDim2.new(0.5, -175, 0.5, -100)
+PasswordFrame.Size = UDim2.new(0, 350, 0, 210)
+PasswordFrame.Visible = false
+
+local PassCorner = Instance.new("UICorner")
+PassCorner.CornerRadius = UDim.new(0, 12)
+PassCorner.Parent = PasswordFrame
+
+local PassStroke = Instance.new("UIStroke")
+PassStroke.Color = Color3.fromRGB(0, 255, 255)
+PassStroke.Thickness = 2
+PassStroke.Parent = PasswordFrame
+
+local PassTitle = Instance.new("TextLabel")
+PassTitle.Parent = PasswordFrame
+PassTitle.BackgroundTransparency = 1
+PassTitle.Position = UDim2.new(0, 0, 0, 20)
+PassTitle.Size = UDim2.new(1, 0, 0, 30)
+PassTitle.Font = Enum.Font.GothamBold
+PassTitle.Text = "🔒 VERIFIKASI SANDI"
+PassTitle.TextColor3 = Color3.fromRGB(0, 255, 255)
+PassTitle.TextSize = 16
+
+local PassDesc = Instance.new("TextLabel")
+PassDesc.Parent = PasswordFrame
+PassDesc.BackgroundTransparency = 1
+PassDesc.Position = UDim2.new(0, 0, 0, 55)
+PassDesc.Size = UDim2.new(1, 0, 0, 20)
+PassDesc.Font = Enum.Font.Gotham
+PassDesc.Text = "Masukkan Sandi (Default: 123)"
+PassDesc.TextColor3 = Color3.fromRGB(180, 180, 220)
+PassDesc.TextSize = 12
+
+local TextBox = Instance.new("TextBox")
+TextBox.Parent = PasswordFrame
+TextBox.BackgroundColor3 = Color3.fromRGB(20, 20, 35)
+TextBox.Position = UDim2.new(0.15, 0, 0, 85)
+TextBox.Size = UDim2.new(0.7, 0, 0, 40)
+TextBox.Font = Enum.Font.GothamBold
+TextBox.PlaceholderText = "Ketik sandi di sini..."
+TextBox.Text = ""
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.TextSize = 14
+TextBox.ClearTextOnFocus = false
+
+local BoxCorner = Instance.new("UICorner")
+BoxCorner.CornerRadius = UDim.new(0, 8)
+BoxCorner.Parent = TextBox
+
+local BoxStroke = Instance.new("UIStroke")
+BoxStroke.Color = Color3.fromRGB(0, 255, 255)
+BoxStroke.Thickness = 1
+BoxStroke.Parent = TextBox
+
+local SubmitBtn = Instance.new("TextButton")
+SubmitBtn.Parent = PasswordFrame
+SubmitBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 180)
+SubmitBtn.Position = UDim2.new(0.15, 0, 0, 140)
+SubmitBtn.Size = UDim2.new(0.7, 0, 0, 40)
+SubmitBtn.Font = Enum.Font.GothamBold
+SubmitBtn.Text = "LOGIN"
+SubmitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SubmitBtn.TextSize = 14
+
+local SubCorner = Instance.new("UICorner")
+SubCorner.CornerRadius = UDim.new(0, 8)
+SubCorner.Parent = SubmitBtn
+
+
+-- ==========================================
+-- 3. BAGIAN UTAMA GUI
+-- ==========================================
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+MainFrame.BackgroundTransparency = 0.1
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -165)
+MainFrame.Size = UDim2.new(0, 400, 0, 330)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Visible = false
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 12)
+MainCorner.Parent = MainFrame
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(0, 255, 255)
+MainStroke.Thickness = 2
+MainStroke.Parent = MainFrame
+
+local Header = Instance.new("Frame")
+Header.Parent = MainFrame
+Header.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
+Header.Size = UDim2.new(1, 0, 0, 45)
+
+local HeaderCorner = Instance.new("UICorner")
+HeaderCorner.CornerRadius = UDim.new(0, 12)
+HeaderCorner.Parent = Header
+
+local Title = Instance.new("TextLabel")
+Title.Parent = Header
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 15, 0, 0)
+Title.Size = UDim2.new(1, -30, 1, 0)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "⚡ CYBER ENGINE X.11 // TRAIN PETS"
+Title.TextColor3 = Color3.fromRGB(0, 255, 255)
+Title.TextSize = 14
+Title.TextXAlignment = Enum.TextXAlignment.Left
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Parent = ScreenGui
+ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+ToggleButton.Position = UDim2.new(0, 20, 0.5, -25)
+ToggleButton.Size = UDim2.new(0, 50, 0, 50)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.Text = "⚡"
+ToggleButton.TextColor3 = Color3.fromRGB(0, 255, 255)
+ToggleButton.TextSize = 22
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+ToggleButton.Visible = false
+
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(1, 0)
+ToggleCorner.Parent = ToggleButton
+
+local ToggleStroke = Instance.new("UIStroke")
+ToggleStroke.Color = Color3.fromRGB(0, 255, 255)
+ToggleStroke.Thickness = 2
+ToggleStroke.Parent = ToggleButton
+
+ToggleButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+local Container = Instance.new("ScrollingFrame")
+Container.Parent = MainFrame
+Container.BackgroundTransparency = 1
+Container.Position = UDim2.new(0, 10, 0, 55)
+Container.Size = UDim2.new(1, -20, 1, -65)
+Container.CanvasSize = UDim2.new(0, 0, 0, 320)
+Container.ScrollBarThickness = 4
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = Container
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 10)
+
+local states = {
+    AutoEgg = false,
+    Magnet = false,
+    AutoHatch = false,
+    AutoPlot = true,
+    AntiAFK = true
+}
+
+local function createToggle(name, stateKey)
+    local btn = Instance.new("TextButton")
+    btn.Parent = Container
+    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.Text = "  " .. name .. ": [ OFF ]"
+    btn.TextColor3 = Color3.fromRGB(255, 100, 100)
+    btn.TextSize = 13
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = btn
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(80, 80, 120)
+    stroke.Thickness = 1
+    stroke.Parent = btn
+
+    btn.MouseButton1Click:Connect(function()
+        states[stateKey] = not states[stateKey]
+        if states[stateKey] then
+            btn.Text = "  " .. name .. ": [ ON ]"
+            btn.TextColor3 = Color3.fromRGB(100, 255, 100)
+            stroke.Color = Color3.fromRGB(0, 255, 255)
+        else
+            btn.Text = "  " .. name .. ": [ OFF ]"
+            btn.TextColor3 = Color3.fromRGB(255, 100, 100)
+            stroke.Color = Color3.fromRGB(80, 80, 120)
+        end
+    end)
+end
+
+createToggle("🥚 Auto Collect Egg", "AutoEgg")
+createToggle("🧲 Magnet Egg (Tarik)", "Magnet")
+createToggle("🐣 Auto Hatch Egg", "AutoHatch")
+createToggle("🏠 Auto Teleport Plot (Anti-Drop)", "AutoPlot")
+createToggle("🛡️ Anti-AFK Server", "AntiAFK")
+
+SubmitBtn.MouseButton1Click:Connect(function()
+    if TextBox.Text == "123" then
+        PasswordFrame.Visible = false
+        MainFrame.Visible = true
+        ToggleButton.Visible = true
+        StarterGui:SetCore("SendNotification", {
+            Title = "⚡ Akses Diterima!",
+            Text = "Selamat datang di Cyber Engine X.11",
+            Duration = 4
+        })
+    else
+        PassDesc.Text = "❌ Sandi Salah! Coba lagi (123)"
+        PassDesc.TextColor3 = Color3.fromRGB(255, 100, 100)
+        task.wait(1.5)
+        PassDesc.Text = "Masukkan Sandi (Default: 123)"
+        PassDesc.TextColor3 = Color3.fromRGB(180, 180, 220)
+    end
+end)
+
+
+-- ==========================================
+-- 4. LOGIKA UTAMA SCRIPT (AUTOMATION)
+-- ==========================================
 local lastTeleportTime = 0
 
--- Fungsi Cari Plot Sendiri
 local function getMyPlotPosition()
     local targetCFrame = nil
     pcall(function()
@@ -59,15 +365,22 @@ local function getMyPlotPosition()
     return targetCFrame
 end
 
--- Looping Utama Berjalan Otomatis di Background
+Players.LocalPlayer.Idled:Connect(function()
+    if states.AntiAFK then
+        VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+        task.wait(1)
+        VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    end
+end)
+
 RunService.Heartbeat:Connect(function()
     pcall(function()
         local char = Player.Character
         if not char then return end
         local hrp = char:FindFirstChild("HumanoidRootPart")
 
-        -- Auto Teleport ke Plot saat Pegang Telur
-        if isAutoPlot and hrp and (tick() - lastTeleportTime > 5) then
+        -- Auto Teleport ke Plot Sendiri Saat Membawa Telur (Anti-Drop)
+        if states.AutoPlot and hrp and (tick() - lastTeleportTime > 5) then
             local isCarryingEgg = false
             for _, child in pairs(char:GetDescendants()) do
                 if child:IsA("BasePart") or child:IsA("Model") then
@@ -79,22 +392,26 @@ RunService.Heartbeat:Connect(function()
                 end
             end
 
+            if Player.Character:FindFirstChild("Holding") or Player.Character:FindFirstChild("Carrying") then
+                isCarryingEgg = true
+            end
+
             if isCarryingEgg then
                 local plotPos = getMyPlotPosition()
                 if plotPos then
                     lastTeleportTime = tick()
+                    for _, desc in pairs(char:GetDescendants()) do
+                        if desc:IsA("BasePart") then
+                            desc.AssemblyLinearVelocity = Vector3.new(0,0,0)
+                        end
+                    end
                     hrp.CFrame = plotPos
-                    StarterGui:SetCore("SendNotification", {
-                        Title = "🥚 Telur Diamankan!",
-                        Text = "Berhasil dibawa ke plot pribadi!",
-                        Duration = 3
-                    })
                 end
             end
         end
 
-        -- Auto Collect & Magnet
-        if (isAutoEgg or isMagnet) and hrp then
+        -- Auto Collect, Magnet, & Auto Hatch
+        if (states.AutoEgg or states.Magnet or states.AutoHatch) and hrp then
             for _, obj in pairs(Workspace:GetDescendants()) do
                 pcall(function()
                     if obj and (obj:IsA("Model") or obj:IsA("BasePart")) then
@@ -103,7 +420,7 @@ RunService.Heartbeat:Connect(function()
                             local part = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")) or obj
                             if part and part:IsA("BasePart") then
                                 if (part.Position - hrp.Position).Magnitude < 45 then
-                                    if isMagnet then
+                                    if states.Magnet then
                                         part.CFrame = hrp.CFrame * CFrame.new(0, 0, -2)
                                     end
                                     local prompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true) or part:FindFirstChildWhichIsA("ProximityPrompt", true)
